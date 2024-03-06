@@ -7,27 +7,46 @@ function App() {
   const [lastName, setLastName] = useState('')
 
   const loadData = () => {
-    // Fetch data from object storage and update state
-    // Example: fetch('https://s3-us-west-2.amazonaws.com/css490/input.txt')
-    //           .then(response => response.text())
-    //           .then(data => setData(data))
-    //           .catch(error => console.error('Error loading data:', error))
+    fetch('https://your-lambda-endpoint', {
+      method: 'POST',
+      body: JSON.stringify({ button: 'loadData' }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => setData(data))
+      .catch(error => console.error('Error loading data:', error))
   }
 
   const clearData = () => {
-    // Clear data from object storage and update state
-    // Example: setData(null)
+    fetch('https://your-lambda-endpoint', {
+      method: 'POST',
+      body: JSON.stringify({ button: 'clearData' }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(() => setData(null))
+      .catch(error => console.error('Error clearing data:', error))
   }
 
   const queryData = () => {
-    // Query data based on first name and last name
-    // Example: const result = data.filter(item => item.firstName === firstName && item.lastName === lastName)
-    //           console.log('Query result:', result)
+    fetch('https://your-lambda-endpoint', {
+      method: 'POST',
+      body: JSON.stringify({ button: 'query', firstName, lastName }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => console.log('Query result:', data))
+      .catch(error => console.error('Error querying data:', error))
   }
 
   return (
     <div>
-      <h1>Website + Storage</h1>
+      <h1>Higginbotham Program 4</h1>
       <div>
         <button onClick={loadData}>Load Data</button>
         <button onClick={clearData}>Clear Data</button>
@@ -39,9 +58,6 @@ function App() {
         <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
         <br />
         <button onClick={queryData}>Query</button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
     </div>
   )
