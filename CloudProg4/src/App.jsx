@@ -7,20 +7,41 @@ function App() {
   const [lastName, setLastName] = useState('')
 
   const loadData = () => {
-    fetch('https://your-lambda-endpoint', {
-      method: 'POST',
-      body: JSON.stringify({ button: 'loadData' }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => setData(data))
-      .catch(error => console.error('Error loading data:', error))
+    // Fetch data from S3
+    fetch('https://s3-us-west-2.amazonaws.com/css490/input.txt')
+      .then(response => response.text())
+      .then(text => {
+        const lines = text.split('\n')
+        const items = lines.map(line => {
+          const [lastName, firstName, ...attributes] = line.split(' ')
+          const item = { lastName, firstName }
+          attributes.forEach(attribute => {
+            const [key, value] = attribute.split('=')
+            item[key] = value
+          })
+          return item
+        })
+        return items
+      })
+      .then(items => {
+        // Send data to Lambda function
+        fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
+          method: 'POST',
+          body: JSON.stringify({ button: 'loadData', object: items }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => setData(data))
+          .catch(error => console.error('Error loading data:', error))
+      })
+      .catch(error => console.error('Error fetching file:', error))
   }
 
   const clearData = () => {
-    fetch('https://your-lambda-endpoint', {
+    // Clear data using Lambda function
+    fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
       body: JSON.stringify({ button: 'clearData' }),
       headers: {
@@ -32,7 +53,8 @@ function App() {
   }
 
   const queryData = () => {
-    fetch('https://your-lambda-endpoint', {
+    // Query data using Lambda function
+    fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
       body: JSON.stringify({ button: 'query', firstName, lastName }),
       headers: {
@@ -40,7 +62,7 @@ function App() {
       }
     })
       .then(response => response.json())
-      .then(data => console.log('Query result:', data))
+      .then(data => setData(data))
       .catch(error => console.error('Error querying data:', error))
   }
 
@@ -59,6 +81,18 @@ function App() {
         <br />
         <button onClick={queryData}>Query</button>
       </div>
+      {data && (
+        <div>
+          <h2>Results</h2>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+      {data && data.body && (
+        <div>
+          <h2>Response Body</h2>
+          <pre>{JSON.stringify(data.body, null, 2)}</pre>
+        </div>
+      )}
     </div>
   )
 }
