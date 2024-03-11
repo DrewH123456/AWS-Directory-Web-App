@@ -11,24 +11,11 @@ function App() {
     // Fetch data from S3
     fetch('https://s3-us-west-2.amazonaws.com/css490/input.txt')
       .then(response => response.text())
-      // .then(text => {
-      //   const lines = text.split('\n');
-      //   const items = lines.map(line => {
-      //     const [lastName, firstName, ...attributes] = line.split(' ');
-      //     const item = { lastName, firstName };
-      //     attributes.forEach(attribute => {
-      //       const [key, value] = attribute.split('=');
-      //       item[key] = value;
-      //     });
-      //     return item;
-      //   });
-      //   return items;
-      // })
       .then(items => {
         // Send data to Lambda function
         fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
           method: 'POST',
-          body: JSON.stringify({ button: 'loadData', key: 'input.txt', object: items }),
+          body: JSON.stringify({ button: 'loadData', fileName: 'input.txt', fileData: items }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -44,7 +31,7 @@ function App() {
     // Clear data using Lambda function
     fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
-      body: JSON.stringify({ button: 'clearData', key: 'input.txt' }),
+      body: JSON.stringify({ button: 'clearData', fileName: 'input.txt' }),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -54,40 +41,19 @@ function App() {
       .catch(error => console.error('Error clearing data:', error));
   };
 
-  const queryData = async () => {
-    // Query data using Lambda function
+  const queryDataData = async () => {
+    // queryData data using Lambda function
     fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
-      body: JSON.stringify({ button: 'query', firstName, lastName }),
+      body: JSON.stringify({ button: 'queryData', firstName, lastName }),
       headers: {
         'Content-Type': 'application/json'
       }
     })
       .then(response => response.json())
       .then(data => setData(data))
-      .catch(error => console.error('Error querying data:', error));
+      .catch(error => console.error('Error queryDataing data:', error));
   };
-
-  // const handleClick = async () => {
-  //   try {
-  //     const response = await fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
-  //       method: 'POST',
-  //       body: JSON.stringify({ button: 'updateState', /* any other data you want to send */ }),
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       }
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch data');
-  //     }
-
-  //     const responseData = await response.json();
-  //     setResult(responseData);
-  //   } catch (error) {
-  //     console.error('Error updating state:', error);
-  //   }
-  // };
 
   return (
     <div>
@@ -102,7 +68,7 @@ function App() {
         <label>Last Name:</label>
         <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
         <br />
-        <button onClick={queryData}>Query</button>
+        <button onClick={queryDataData}>queryData</button>
         {/* <button onClick={handleClick}>Update State</button> */}
       </div>
       {data && (
