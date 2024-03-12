@@ -15,7 +15,7 @@ function App() {
         // Send data to Lambda function
         fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
           method: 'POST',
-          body: JSON.stringify({ button: 'loadData', fileName: 'input.txt', fileData: items }),
+          body: JSON.stringify({ button: 'loadData', key: 'input.txt', object: items }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -31,7 +31,7 @@ function App() {
     // Clear data using Lambda function
     fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
-      body: JSON.stringify({ button: 'clearData', fileName: 'input.txt' }),
+      body: JSON.stringify({ button: 'clearData', key: 'input.txt' }),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -45,14 +45,14 @@ function App() {
     // queryData data using Lambda function
     fetch('https://pm3cd73culmxojlhxrttdmkag40loirs.lambda-url.us-east-2.on.aws/', {
       method: 'POST',
-      body: JSON.stringify({ button: 'queryData', firstName, lastName }),
+      body: JSON.stringify({ button: 'queryData', key: 'input.txt', lastName, firstName }),
       headers: {
         'Content-Type': 'application/json'
       }
     })
       .then(response => response.json())
       .then(data => setData(data))
-      .catch(error => console.error('Error queryDataing data:', error));
+      .catch(error => console.error('Error querying data:', error));
   };
 
   return (
@@ -68,7 +68,7 @@ function App() {
         <label>Last Name:</label>
         <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
         <br />
-        <button onClick={queryDataData}>queryData</button>
+        <button onClick={queryDataData}>QueryData</button>
         {/* <button onClick={handleClick}>Update State</button> */}
       </div>
       {data && (
